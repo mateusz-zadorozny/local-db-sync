@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Define your settings
-KEY_PATH="/Users/mateuszzadorozny/mati2022"
-IP_ADDRESS="23.88.126.224"
-SITE_NAME="gardenliving.pl"
-LOCAL_DIRECTORY="/Users/mateuszzadorozny/Local Sites/gardenliving/app/public/local-db-sync"
-LOCAL_WP_ROOT="/Users/mateuszzadorozny/Local Sites/gardenliving/app/public"
-OLD_DOMAIN="https://gardenliving.pl"
-NEW_DOMAIN="https://gardenliving.local"
+KEY_PATH="/Users/username/keyname"
+IP_ADDRESS="123.456.123.456"
+SITE_NAME="site.url"
+LOCAL_DIRECTORY="/Users/username/Local Sites/site/app/public/local-db-sync"
+LOCAL_WP_ROOT="/Users/username/Local Sites/site/app/public"
+OLD_DOMAIN="https://site.url"
+NEW_DOMAIN="https://site.local"
 
 # Database parameters
 DB_NAME="local"
@@ -25,20 +25,23 @@ if [ -f "$LOCAL_DIRECTORY/backup.sql" ]; then
     fi
 fi
 
-# If the to_local.sql file is not present, execute the remote part
-if [ ! -f "$LOCAL_DIRECTORY/to_local.sql" ]; then
-    # Remote code
-    # Use WP CLI to export the database
-    echo "Exporting the database..."
-    ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "gp wp $SITE_NAME db export /var/www/$SITE_NAME/htdocs/to_local.sql --all-tablespaces --add-drop-table"
+# If the to_local.sql file is present, ask the user if they want to import again
+if [ -f "$LOCAL_DIRECTORY/to_local.sql" ]; then
+    read -p "Imported database found. Want to import again from the remote server? Type 'n' to use the file in the folder (y/n): " choice
+    if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+        # Remote code
+        # Use WP CLI to export the database
+        echo "Exporting the database..."
+        ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "gp wp $SITE_NAME db export /var/www/$SITE_NAME/htdocs/to_local.sql --all-tablespaces --add-drop-table"
 
-    # SCP to download the exported .sql file
-    echo "Downloading the database..."
-    scp -i "$KEY_PATH" root@"$IP_ADDRESS":/var/www/"$SITE_NAME"/htdocs/to_local.sql "$LOCAL_DIRECTORY"
+        # SCP to download the exported .sql file
+        echo "Downloading the database..."
+        scp -i "$KEY_PATH" root@"$IP_ADDRESS":/var/www/"$SITE_NAME"/htdocs/to_local.sql "$LOCAL_DIRECTORY"
 
-    # Remove the .sql file from the remote server
-    echo "Removing the .sql file from the remote server..."
-    ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "rm /var/www/$SITE_NAME/htdocs/to_local.sql"
+        # Remove the .sql file from the remote server
+        echo "Removing the .sql file from the remote server..."
+        ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "rm /var/www/$SITE_NAME/htdocs/to_local.sql"
+    fi
 fi
 
 # Backup the local database

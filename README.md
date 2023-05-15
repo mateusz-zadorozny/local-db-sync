@@ -1,4 +1,4 @@
-# GridPane to LocalWP 0.1
+# GridPane to LocalWP: Local-DB-Sync v0.1
 
 Script for updating and rewriting the LocalWP database
 
@@ -16,3 +16,10 @@ Script for updating and rewriting the LocalWP database
 4. Go with the and answer questions if needed
 5. Remove backup.sql only manually for safety reasons (rm backup.sql)
 
+## License
+
+Local-DB-Sync is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+Search-Replace-DB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Search-Replace-DB. If not, see https://www.gnu.org/licenses/.
