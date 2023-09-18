@@ -26,22 +26,21 @@ if [ -f "$LOCAL_DIRECTORY/backup.sql" ]; then
 fi
 
 # If the to_local.sql file is present, ask the user if they want to import again
-if [ -f "$LOCAL_DIRECTORY/to_local.sql" ]; then
-    read -p "Imported database found. Want to import again from the remote server? Type 'n' to use the file in the folder (y/n): " choice
-    if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
-        # Remote code
-        # Use WP CLI to export the database
-        echo "Exporting the database..."
-        ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "gp wp $SITE_NAME db export /var/www/$SITE_NAME/htdocs/to_local.sql --all-tablespaces --add-drop-table"
+if [ ! -f "$LOCAL_DIRECTORY/to_local.sql" ] || { 
+    [ -f "$LOCAL_DIRECTORY/to_local.sql" ] && read -p "Imported database found. Want to import again from the remote server? Type 'n' to use the file in the folder (y/n): " choice && [[ "$choice" == "y" || "$choice" == "Y" ]]; 
+}; then
+    # Remote code
+    # Use WP CLI to export the database
+    echo "Exporting the database..."
+    ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "gp wp $SITE_NAME db export /var/www/$SITE_NAME/htdocs/to_local.sql --all-tablespaces --add-drop-table"
 
-        # SCP to download the exported .sql file
-        echo "Downloading the database..."
-        scp -i "$KEY_PATH" root@"$IP_ADDRESS":/var/www/"$SITE_NAME"/htdocs/to_local.sql "$LOCAL_DIRECTORY"
+    # SCP to download the exported .sql file
+    echo "Downloading the database..."
+    scp -i "$KEY_PATH" root@"$IP_ADDRESS":/var/www/"$SITE_NAME"/htdocs/to_local.sql "$LOCAL_DIRECTORY"
 
-        # Remove the .sql file from the remote server
-        echo "Removing the .sql file from the remote server..."
-        ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "rm /var/www/$SITE_NAME/htdocs/to_local.sql"
-    fi
+    # Remove the .sql file from the remote server
+    echo "Removing the .sql file from the remote server..."
+    ssh -i "$KEY_PATH" root@"$IP_ADDRESS" "rm /var/www/$SITE_NAME/htdocs/to_local.sql"
 fi
 
 # Backup the local database
